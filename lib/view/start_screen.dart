@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:owwn_coding_challenge/bloc/auth_cubit.dart';
+import 'package:owwn_coding_challenge/bloc/credential_cubit.dart';
 import 'package:owwn_coding_challenge/main.dart';
 
 class StartScreen extends StatelessWidget {
@@ -9,9 +9,11 @@ class StartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
+    return BlocListener<CredentialCubit, CredentialState>(
       listener: (_, state) {
-        if (state == AuthState.authorized) {
+        if (state is CredentialsAuthorized) {
+          context.goNamed(RouteNames.secondPage);
+        } else if (state is CredentialsUnAuthorized) {
           context.goNamed(RouteNames.authScreen);
         }
       },
@@ -24,7 +26,7 @@ class StartScreen extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  BlocProvider.of<AuthCubit>(context).authorize();
+                  BlocProvider.of<CredentialCubit>(context).checkCredentials();
                 },
                 child: const DecoratedBox(
                   decoration: BoxDecoration(

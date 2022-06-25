@@ -2,80 +2,119 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:owwn_coding_challenge/bloc/auth_cubit.dart';
+import 'package:owwn_coding_challenge/bloc/credential_cubit.dart';
 import 'package:owwn_coding_challenge/service/auth_service.dart';
+import 'package:owwn_coding_challenge/service/credential_service.dart';
+import 'package:owwn_coding_challenge/service/http_helper.dart';
 import 'package:owwn_coding_challenge/styles.dart';
 import 'package:owwn_coding_challenge/view/auth_screen.dart';
 import 'package:owwn_coding_challenge/view/start_screen.dart';
 
-class BlocConfig {
-  final AuthCubit authCubit;
+class Config {
+  final CredentialService credentialService;
+  final AuthService Function(BuildContext) authService;
 
-  BlocConfig(this.authCubit);
+  Config({
+    required this.credentialService,
+    required this.authService,
+  });
 }
 
+GoRouter _router = GoRouter(
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  routes: <GoRoute>[
+    GoRoute(
+      name: RouteNames.startScreen,
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) =>
+          const StartScreen(),
+    ),
+    GoRoute(
+      name: RouteNames.authScreen,
+      path: '/auth',
+      builder: (BuildContext context, GoRouterState state) =>
+          const AuthScreen(),
+    ),
+    GoRoute(
+      name: RouteNames.secondPage,
+      path: '/page2',
+      builder: (BuildContext context, GoRouterState state) =>
+          const SecondPage(),
+      routes: [
+        GoRoute(
+          name: RouteNames.thirdPage,
+          path: ':name',
+          builder: (BuildContext context, GoRouterState state) => ThirdPage(
+            userName: state.params['name'] ?? '',
+          ),
+        ),
+      ],
+    ),
+  ],
+);
+
 void main() {
+  final router = _router;
+  HttpHelper getHttpHelper(BuildContext context) => HttpHelper(
+        baseUrl: 'https://ccoding.owwn.com/hermes/',
+        client: http.Client(),
+        getAccessToken: () {
+          final credentialState =
+              BlocProvider.of<CredentialCubit>(context).state;
+          if (credentialState is CredentialsAuthorized) {
+            return credentialState.credential.accessToken;
+          }
+          return '';
+        },
+        onRefreshTokenExpired: () => router.goNamed(RouteNames.authScreen),
+        onRefreshCredential:
+            BlocProvider.of<CredentialCubit>(context).saveCredentials,
+      );
+
+  final config = Config(
+    credentialService: CredentialServiceImpl(const FlutterSecureStorage()),
+    authService: (context) => AuthService(getHttpHelper(context)),
+  );
   runApp(
     MyApp(
-      blocConfig:
-          BlocConfig(AuthCubit(AuthService(const FlutterSecureStorage()))),
+      config: config,
+      router: router,
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final BlocConfig blocConfig;
+  final Config config;
+  final GoRouter router;
 
-  MyApp({
+  const MyApp({
     super.key,
-    required this.blocConfig,
+    required this.config,
+    required this.router,
   });
-
-  late final GoRouter _router = GoRouter(
-    initialLocation: '/',
-    debugLogDiagnostics: true,
-    routes: <GoRoute>[
-      GoRoute(
-        name: RouteNames.startScreen,
-        path: '/',
-        builder: (BuildContext context, GoRouterState state) =>
-            const StartScreen(),
-      ),
-      GoRoute(
-        name: RouteNames.authScreen,
-        path: '/auth',
-        builder: (BuildContext context, GoRouterState state) =>
-            const AuthScreen(),
-      ),
-      GoRoute(
-        name: RouteNames.secondPage,
-        path: '/page2',
-        builder: (BuildContext context, GoRouterState state) =>
-            const SecondPage(),
-        routes: [
-          GoRoute(
-            name: RouteNames.thirdPage,
-            path: ':name',
-            builder: (BuildContext context, GoRouterState state) => ThirdPage(
-              userName: state.params['name'] ?? '',
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
 
   @override
   Widget build(BuildContext context) => MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) => blocConfig.authCubit,
+            create: (_) => CredentialCubit(
+              config.credentialService,
+            ),
+          ),
+          BlocProvider(
+            create: (context) => AuthCubit(
+              config.authService(context),
+              BlocProvider.of<CredentialCubit>(context),
+            ),
           )
         ],
         child: MaterialApp.router(
-          routeInformationProvider: _router.routeInformationProvider,
-          routeInformationParser: _router.routeInformationParser,
-          routerDelegate: _router.routerDelegate,
+          routeInformationProvider: router.routeInformationProvider,
+          routeInformationParser: router.routeInformationParser,
+          routerDelegate: router.routerDelegate,
           title: 'Coding Test',
           theme: darkTheme,
         ),
