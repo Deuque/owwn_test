@@ -10,11 +10,11 @@ class Credential extends Equatable {
   });
 
   Map<String, dynamic> toJson() =>
-      {'accessToken': accessToken, 'refreshToken': refreshToken};
+      {'access_token': accessToken, 'refresh_token': refreshToken};
 
   factory Credential.fromJson(Map<String, dynamic> json) => Credential(
-        accessToken: (json['accessToken'] ?? '') as String,
-        refreshToken: (json['refreshToken'] ?? '') as String,
+        accessToken: (json['access_token'] ?? '') as String,
+        refreshToken: (json['refresh_token'] ?? '') as String,
       );
 
   @override

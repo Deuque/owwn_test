@@ -7,7 +7,7 @@ abstract class AppColors {
   static const blue1 = Color(0xFF2E22F7);
 }
 
-ThemeData darkTheme = ThemeData(
+ThemeData darkTheme = ThemeData.dark().copyWith(
   scaffoldBackgroundColor: AppColors.dark1,
   inputDecorationTheme: const InputDecorationTheme(
     labelStyle: TextStyle(color: AppColors.grey1),

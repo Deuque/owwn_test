@@ -27,7 +27,7 @@ class CredentialServiceImpl extends CredentialService {
   Future<void> saveCredentials(Credential credential) async {
     try {
       final encodedString = jsonEncode(credential.toJson());
-      return await secureStorage.write(
+      await secureStorage.write(
         key: credentialKey,
         value: encodedString,
       );
@@ -36,7 +36,7 @@ class CredentialServiceImpl extends CredentialService {
 
   @override
   Future<void> deleteCredentials() {
-    throw UnimplementedError();
+    return secureStorage.deleteAll();
   }
 }
 

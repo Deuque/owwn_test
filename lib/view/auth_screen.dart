@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:owwn_coding_challenge/bloc/auth_cubit.dart';
-import 'package:owwn_coding_challenge/main.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -52,8 +50,9 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
-                  if (state is AuthSuccess) {
-                    context.goNamed(RouteNames.secondPage);
+                  if (state is AuthError) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(state.error)));
                   }
                 },
                 builder: (context, state) {
