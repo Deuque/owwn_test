@@ -8,14 +8,13 @@ import 'package:owwn_coding_challenge/bloc/credential_cubit.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/helpers/http_helper.dart';
 import 'package:owwn_coding_challenge/helpers/selectors.dart';
-import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/service/auth_service.dart';
 import 'package:owwn_coding_challenge/service/credential_service.dart';
 import 'package:owwn_coding_challenge/service/users_service.dart';
 import 'package:owwn_coding_challenge/styles.dart';
+import 'package:owwn_coding_challenge/view/all_users_screen.dart';
 import 'package:owwn_coding_challenge/view/auth_screen.dart';
 import 'package:owwn_coding_challenge/view/start_screen.dart';
-import 'package:owwn_coding_challenge/view/users_screen.dart';
 
 class Config {
   final CredentialService credentialService;
@@ -30,7 +29,7 @@ class Config {
 }
 
 void main() {
-  HttpHelper getHttpHelper(BuildContext context) => HttpHelper(
+  HttpHelper getHttpHelper(BuildContext context) => HttpHelperImpl(
         baseUrl: 'https://ccoding.owwn.com/hermes',
         client: http.Client(),
         getAccessToken: () => credentialSel(context)?.accessToken ?? '',
@@ -113,7 +112,7 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: RoutePaths.users,
           builder: (BuildContext context, GoRouterState state) =>
-              const UsersScreen(),
+              const AllUsersScreen(),
           routes: [
             // GoRoute(
             //   name: RouteNames.userDetails,

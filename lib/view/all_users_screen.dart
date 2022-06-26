@@ -4,14 +4,21 @@ import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/styles.dart';
 
-class UsersScreen extends StatefulWidget {
-  const UsersScreen({Key? key}) : super(key: key);
-
-  @override
-  State<UsersScreen> createState() => _UsersScreenState();
+abstract class AllUsersScreenKeys {
+  static const errorView = Key('errorView');
+  static const errorSnackBarView = Key('errorSnackBarView');
+  static const loadedUsersView = Key('loadedUsersView');
+  static const loadMoreButton = Key('loadMoreButton');
 }
 
-class _UsersScreenState extends State<UsersScreen> {
+class AllUsersScreen extends StatefulWidget {
+  const AllUsersScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AllUsersScreen> createState() => _AllUsersScreenState();
+}
+
+class _AllUsersScreenState extends State<AllUsersScreen> {
   late final ScrollController _scrollController;
 
   @override
@@ -57,7 +64,10 @@ class _UsersScreenState extends State<UsersScreen> {
                 listener: (_, state) {
                   if (state.userPages.isNotEmpty && state.error != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.error!)),
+                      SnackBar(
+                        key: AllUsersScreenKeys.errorSnackBarView,
+                        content: Text(state.error!),
+                      ),
                     );
                   }
                 },
@@ -69,6 +79,7 @@ class _UsersScreenState extends State<UsersScreen> {
                         vertical: 20,
                       ),
                       child: Column(
+                        key: AllUsersScreenKeys.loadedUsersView,
                         children: [
                           ...state.userPages.map(
                             (e) => _UsersPageLayout(
@@ -87,6 +98,7 @@ class _UsersScreenState extends State<UsersScreen> {
                             )
                           else if (!state.hasLoadedAllUsers)
                             TextButton(
+                              key: AllUsersScreenKeys.loadMoreButton,
                               onPressed: _loadUsers,
                               child: const Text('Load more users'),
                             )
@@ -109,6 +121,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
                   if (state.error != null) {
                     return Container(
+                      key: AllUsersScreenKeys.errorView,
                       padding: const EdgeInsets.only(top: 30),
                       alignment: Alignment.center,
                       child: Column(

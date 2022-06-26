@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:http/http.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/helpers/http_helper.dart';
 import 'package:owwn_coding_challenge/helpers/request_mapper.dart';
-import 'package:owwn_coding_challenge/model/credentials.dart';
 
 class UsersServiceImpl extends UsersService {
   final HttpHelper httpHelper;

@@ -30,7 +30,7 @@ void main() {
       refreshResponse,
     );
 
-    final httpHelper = HttpHelper(
+    final httpHelper = HttpHelperImpl(
       baseUrl: '',
       client: client,
       getAccessToken: () => accessToken,
@@ -63,7 +63,7 @@ void main() {
       refreshResponse,
     );
 
-    final httpHelper = HttpHelper(
+    final httpHelper = HttpHelperImpl(
       baseUrl: '',
       client: client,
       getAccessToken: () => '',

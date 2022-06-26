@@ -12,7 +12,7 @@ class CredentialCubit extends Cubit<CredentialState> {
       ValueNotifier(CredentialsUnknown());
 
   Future<void> saveCredentials(Credential credential) async {
-   await credentialService.saveCredentials(credential);
+    await credentialService.saveCredentials(credential);
     emit(CredentialsAuthorized(credential));
   }
 

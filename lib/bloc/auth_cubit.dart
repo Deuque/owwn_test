@@ -26,8 +26,11 @@ class AuthCubit extends Cubit<AuthState> {
 abstract class AuthState {}
 
 class AuthInitial extends AuthState {}
+
 class AuthLoading extends AuthState {}
+
 class AuthSuccess extends AuthState {}
+
 class AuthError extends AuthState {
   final String error;
 
@@ -36,9 +39,9 @@ class AuthError extends AuthState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is AuthError &&
-              runtimeType == other.runtimeType &&
-              error == other.error;
+      other is AuthError &&
+          runtimeType == other.runtimeType &&
+          error == other.error;
 
   @override
   int get hashCode => error.hashCode;

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:owwn_coding_challenge/model/credentials.dart';
 
-class HttpHelper {
+class HttpHelperImpl extends HttpHelper {
   final String baseUrl;
   final http.Client client;
   final String Function() getAccessToken;
@@ -15,7 +15,7 @@ class HttpHelper {
   final VoidCallback onRefreshTokenExpired;
   final Future<void> Function(Credential) onRefreshCredential;
 
-  HttpHelper({
+  HttpHelperImpl({
     required this.baseUrl,
     required this.client,
     required this.getAccessToken,
@@ -24,6 +24,7 @@ class HttpHelper {
     required this.onRefreshCredential,
   });
 
+  @override
   Future<http.Response> sendRequest({
     required String method,
     required String endPoint,
@@ -91,4 +92,13 @@ class HttpHelper {
     }
     return onError(response);
   }
+}
+
+abstract class HttpHelper {
+  Future<http.Response> sendRequest({
+    required String method,
+    required String endPoint,
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+  });
 }
