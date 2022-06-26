@@ -2,8 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:owwn_coding_challenge/bloc/credential_cubit.dart';
 import 'package:owwn_coding_challenge/service/auth_service.dart';
 
-part 'auth_state.dart';
-
 class AuthCubit extends Cubit<AuthState> {
   final AuthService authService;
   final CredentialCubit credentialCubit;
@@ -23,4 +21,25 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthSuccess());
     }
   }
+}
+
+abstract class AuthState {}
+
+class AuthInitial extends AuthState {}
+class AuthLoading extends AuthState {}
+class AuthSuccess extends AuthState {}
+class AuthError extends AuthState {
+  final String error;
+
+  AuthError(this.error);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is AuthError &&
+              runtimeType == other.runtimeType &&
+              error == other.error;
+
+  @override
+  int get hashCode => error.hashCode;
 }

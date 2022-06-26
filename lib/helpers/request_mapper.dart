@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:http/http.dart';
 
 class ResponseModel<T> {
@@ -21,7 +23,8 @@ Future<ResponseModel<T>> makeRequest<T>({
     } else {
       return onError(response.body, response.statusCode);
     }
-  } catch (e) {
+  } catch (e,st) {
+    log('$st');
     return onError(e.toString(), 404);
   }
 }

@@ -1,24 +1,26 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/helpers/http_helper.dart';
 import 'package:owwn_coding_challenge/helpers/request_mapper.dart';
 import 'package:owwn_coding_challenge/model/credentials.dart';
 
-class AuthServiceImpl extends AuthService {
+class UsersServiceImpl extends UsersService {
   final HttpHelper httpHelper;
 
-  AuthServiceImpl(this.httpHelper);
+  UsersServiceImpl(this.httpHelper);
 
   @override
-  Future<ResponseModel<Credential>> signIn(String email) async {
-    final body = {'email': email};
+  Future<ResponseModel<UsersResponse>> loadUsers(int limit, int page) async {
     return makeRequest(
-      call: () =>
-          httpHelper.sendRequest(method: 'POST', endPoint: 'auth', body: body),
+      call: () => httpHelper.sendRequest(
+        method: 'GET',
+        endPoint: 'users?limit=$limit&page=$page',
+      ),
       onSuccess: (response) {
         return ResponseModel(
-          value: Credential.fromJson(
+          value: UsersResponse.fromJson(
             jsonDecode(response.body) as Map<String, dynamic>,
           ),
         );
@@ -31,6 +33,6 @@ class AuthServiceImpl extends AuthService {
   }
 }
 
-abstract class AuthService {
-  Future<ResponseModel<Credential>> signIn(String email);
+abstract class UsersService {
+  Future<ResponseModel<UsersResponse>> loadUsers(int limit, int page);
 }

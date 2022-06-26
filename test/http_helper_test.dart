@@ -44,8 +44,7 @@ void main() {
 
     expect(accessToken, '');
     expect(actions.length, 0);
-    final response =
-        await httpHelper.sendRequest(http.Request('GET', Uri.parse('')));
+    final response = await httpHelper.sendRequest(method: 'GET', endPoint: '');
     expect(response.statusCode, 200);
     expect(accessToken, 'new_access');
     expect(actions.length, 1);
@@ -74,8 +73,7 @@ void main() {
     );
 
     expect(actions.length, 0);
-    final response =
-        await httpHelper.sendRequest(http.Request('GET', Uri.parse('')));
+    final response = await httpHelper.sendRequest(method: 'GET', endPoint: '');
     expect(response.statusCode, 401);
     expect(actions.length, 1);
     expect(actions.first, 'refresh_token_expired');

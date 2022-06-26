@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
+import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/styles.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -9,24 +12,23 @@ class UsersScreen extends StatefulWidget {
 }
 
 class _UsersScreenState extends State<UsersScreen> {
-  late ScrollController _scrollController;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      print(_scrollController.position.maxScrollExtent);
-      print(_scrollController.position.pixels);
-      // if (_scrollController.position.maxScrollExtent ==
-      //     _scrollController.position.pixels) {
-      //   if (!isLoading) {
-      //     isLoading = !isLoading;
-      //     // Perform event when user reach at the end of list (e.g. do Api call)
-      //   }
-      // }
-    });
+    _loadUsers();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        final pixels = _scrollController.position.pixels;
+        final maxExtent = _scrollController.position.maxScrollExtent;
+        if (pixels == maxExtent) {
+          _loadUsers();
+        }
+      });
   }
+
+  void _loadUsers() => BlocProvider.of<UsersCubit>(context).loadUsers();
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +51,89 @@ class _UsersScreenState extends State<UsersScreen> {
               },
             ),
           ),
-          SliverFillRemaining(
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: Text('Hekkkkkoo'),
-            ),
-          )
+          SliverList(
+            delegate: SliverChildListDelegate([
+              BlocConsumer<UsersCubit, UsersState>(
+                listener: (_, state) {
+                  if (state.userPages.isNotEmpty && state.error != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.error!)),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state.userPages.isNotEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        children: [
+                          ...state.userPages.map(
+                            (e) => _UsersPageLayout(
+                              users: e,
+                            ),
+                          ),
+                          if (state.loading)
+                            const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.white),
+                                strokeWidth: 2,
+                              ),
+                            )
+                          else if (!state.hasLoadedAllUsers)
+                            TextButton(
+                              onPressed: _loadUsers,
+                              child: const Text('Load more users'),
+                            )
+                        ],
+                      ),
+                    );
+                  }
+                  if (state.loading) {
+                    return Container(
+                      height: 40,
+                      width: 40,
+                      margin: const EdgeInsets.only(top: 30),
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                        strokeWidth: 2,
+                      ),
+                    );
+                  }
+
+                  if (state.error != null) {
+                    return Container(
+                      padding: const EdgeInsets.only(top: 30),
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Text(
+                            state.error.toString(),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextButton(
+                            onPressed: _loadUsers,
+                            child: const Text('Refresh'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+            ]),
+          ),
         ],
       ),
     );
@@ -68,18 +147,105 @@ class _UsersScreenState extends State<UsersScreen> {
             fit: BoxFit.cover,
           ),
           const Positioned.fill(
-              child: DecoratedBox(
-            decoration: BoxDecoration(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                AppColors.dark1,
-              ],
-              stops: [.4, 5],
-            )),
-          ))
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    AppColors.dark1,
+                  ],
+                  stops: [.4, 5],
+                ),
+              ),
+            ),
+          )
         ],
       );
+}
+
+class _UsersPageLayout extends StatelessWidget {
+  final List<User> users;
+
+  const _UsersPageLayout({
+    Key? key,
+    required this.users,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final activeUsers =
+        users.where((element) => element.status == Status.active);
+    final inActiveUsers =
+        users.where((element) => element.status == Status.inactive);
+    return Column(
+      children: [
+        if (activeUsers.isNotEmpty) _userGroup('Active', activeUsers.toList()),
+        if (inActiveUsers.isNotEmpty)
+          _userGroup('Inactive', inActiveUsers.toList()),
+      ],
+    );
+  }
+
+  Widget _userGroup(String title, List<User> groupUsers) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: AppColors.dark2,
+          ),
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (_, i) {
+              final user = groupUsers[i];
+              return ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.white.withOpacity(.08),
+                  radius: 19,
+                  child: Text(
+                    user.initials(),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                title: Text(
+                  user.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(user.email),
+              );
+            },
+            separatorBuilder: (_, i) => const Divider(
+              height: 1.5,
+              thickness: 1.5,
+              color: AppColors.dark1,
+            ),
+            itemCount: groupUsers.length,
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
+    );
+  }
 }

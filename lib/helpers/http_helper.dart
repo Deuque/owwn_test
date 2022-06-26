@@ -24,18 +24,23 @@ class HttpHelper {
     required this.onRefreshCredential,
   });
 
-  String get apiUrl => baseUrl;
-
-  Future<http.Response> sendRequest(
-    http.BaseRequest request,
-  ) async {
+  Future<http.Response> sendRequest({
+    required String method,
+    required String endPoint,
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+  }) async {
     http.Response? sendResponse;
 
-    final modifiedRequest = request
-      ..headers[HttpHeaders.authorizationHeader] = 'Bearer ${getAccessToken()}'
-      ..headers['X-API-KEY'] = 'test-hermes';
+    final modifiedRequest =
+        http.Request(method, Uri.parse('$baseUrl/$endPoint'))
+          ..headers.addAll(headers ?? {})
+          ..headers[HttpHeaders.authorizationHeader] =
+              'Bearer ${getAccessToken()}'
+          ..headers['X-API-KEY'] = 'test-hermes'
+          ..body = jsonEncode(body);
 
-    log('REQUEST: $request ${(request as http.Request).body}');
+    log('REQUEST: $modifiedRequest $body');
 
     final requestResponse = await client.send(modifiedRequest);
 
@@ -46,11 +51,18 @@ class HttpHelper {
         onSuccess: (credentials) async {
           log('ACCESS TOKEN REFRESH SUCCESS');
           await onRefreshCredential(credentials);
-          sendResponse = await sendRequest(request);
+
+          sendResponse = await sendRequest(
+            method: method,
+            endPoint: endPoint,
+            headers: headers,
+            body: body,
+          );
         },
         onError: (response) {
           log('ACCESS TOKEN REFRESH ERROR');
           if (response.statusCode == 401) {
+            log('REFRESH TOKEN EXPIRED');
             onRefreshTokenExpired();
           }
           sendResponse = response;
@@ -66,12 +78,10 @@ class HttpHelper {
     required ValueChanged<Credential> onSuccess,
     required ValueChanged<http.Response> onError,
   }) async {
-    final response = await client.post(
-      Uri.parse('$apiUrl/refresh'),
-      body: {
-        'refresh_token': refreshToken,
-      },
-    );
+    final url = Uri.parse('$baseUrl/refresh');
+    final body = jsonEncode({'refresh_token': refreshToken});
+    log('REQUEST: POST $url $body');
+    final response = await client.post(url, body: body);
     if (response.statusCode == 200) {
       return onSuccess(
         Credential.fromJson(

@@ -18,7 +18,6 @@ class CredentialCubit extends Cubit<CredentialState> {
 
   Future<void> checkCredentials() async {
     final credential = await credentialService.getCredentials();
-    print(credential);
     if (credential == null) {
       emit(CredentialsUnAuthorized());
     } else {
