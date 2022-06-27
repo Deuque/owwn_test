@@ -237,7 +237,7 @@ class _UsersPageLayout extends StatelessWidget {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 leading: Hero(
-                  tag: user.initials,
+                  tag: user.initials + user.id,
                   child: CircleAvatar(
                     backgroundColor: AppColors.grey3,
                     radius: 19,
@@ -252,7 +252,7 @@ class _UsersPageLayout extends StatelessWidget {
                   ),
                 ),
                 title: Hero(
-                  tag: user.name,
+                  tag: user.name + user.id,
                   child: Material(
                     color: Colors.transparent,
                     child: Text(
@@ -268,7 +268,7 @@ class _UsersPageLayout extends StatelessWidget {
                   ),
                 ),
                 subtitle: Hero(
-                  tag: user.email,
+                  tag: user.email + user.id,
                   child: Material(
                     color: Colors.transparent,
                     child: Text(

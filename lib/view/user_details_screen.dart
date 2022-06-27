@@ -1,6 +1,5 @@
 import 'package:chart_sparkline/chart_sparkline.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_chart/charts/line-chart.widget.dart';
@@ -124,7 +123,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                           child: Column(
                             children: [
                               Hero(
-                                tag: user.initials,
+                                tag: user.initials + user.id,
                                 child: Stack(
                                   children: [
                                     CircleAvatar(
@@ -158,7 +157,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                 height: 34,
                               ),
                               Hero(
-                                tag: user.name,
+                                tag: user.name + user.id,
                                 child: Material(
                                   color: Colors.transparent,
                                   child: TextFormField(
@@ -184,7 +183,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                 ),
                               ),
                               Hero(
-                                tag: user.email,
+                                tag: user.email + user.id,
                                 child: Material(
                                   color: Colors.transparent,
                                   child: TextFormField(
