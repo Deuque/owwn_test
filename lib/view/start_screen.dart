@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:owwn_coding_challenge/bloc/credential_cubit.dart';
 
+abstract class StartScreenKeys{
+  static const startButton = Key('startButton');
+}
 class StartScreen extends StatelessWidget {
   const StartScreen({Key? key}) : super(key: key);
 
@@ -19,6 +22,7 @@ class StartScreen extends StatelessWidget {
                 BlocProvider.of<CredentialCubit>(context).checkCredentials();
               },
               child: const DecoratedBox(
+                key: StartScreenKeys.startButton,
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     colors: [

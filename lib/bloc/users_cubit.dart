@@ -21,7 +21,9 @@ class UsersCubit extends Cubit<UsersState> {
       emit(state.withError(response.error.toString()));
     } else {
       final usersResponse = response.value;
-      final newUserPages = [...state.userPages, usersResponse!.users];
+      final newUsers = usersResponse!.users
+        ..removeWhere((e) => _allUsers(state.userPages).contains(e));
+      final newUserPages = [...state.userPages, newUsers];
       emit(
         state.copyWith(
           loading: false,

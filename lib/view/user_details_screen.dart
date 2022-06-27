@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/styles.dart';
+
+abstract class UserDetailsScreenKeys {
+  static const emailField = Key('emailField');
+  static const nameField = Key('nameField');
+  static const saveButton = Key('saveButton');
+  static const backButton = Key('backButton');
+}
 
 class UserDetailsScreen extends StatefulWidget {
   final String userId;
@@ -64,7 +72,14 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: !_editing,
+          automaticallyImplyLeading: false,
+          leading: !_editing
+              ? IconButton(
+                  key: UserDetailsScreenKeys.backButton,
+                  onPressed: () => context.pop(),
+                  icon: const Icon(Icons.arrow_back_ios),
+                )
+              : null,
           actions: [
             if (_editing)
               IconButton(
@@ -140,6 +155,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: TextFormField(
+                                    key: UserDetailsScreenKeys.nameField,
                                     focusNode: _nameFocusNode,
                                     initialValue: name,
                                     style: const TextStyle(
@@ -163,6 +179,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: TextFormField(
+                                    key: UserDetailsScreenKeys.emailField,
                                     focusNode: _emailFocusNode,
                                     initialValue: email,
                                     style: const TextStyle(
@@ -191,6 +208,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         child: ElevatedButton(
+                          key: UserDetailsScreenKeys.saveButton,
                           onPressed: () => _onUpdate(user),
                           child: const Text('SAVE'),
                         ),
@@ -219,7 +237,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   void _onUpdate(User oldUser) {
     if (_formKey.currentState?.validate() != true) return;
     _formKey.currentState?.save();
-print(email);
+
     final newUser = User(
       id: oldUser.id,
       name: name,
