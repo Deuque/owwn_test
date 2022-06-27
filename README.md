@@ -1,5 +1,5 @@
 # Submission Preview
-<img src="assets/owwn_gif.gif" height="420"/>
+<img src="assets/owwn.gif" height="420"/>
 <br/>
 
 # Flutter Coding Challenge
