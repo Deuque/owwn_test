@@ -1,3 +1,7 @@
+# Submission Preview
+<img src="assets/owwn_gif.gif" height="420"/>
+<br/>
+
 # Flutter Coding Challenge
 :blue_heart: If you're here, it means we've decided to move forward with your application!
 
