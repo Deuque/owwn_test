@@ -1,5 +1,6 @@
 import 'package:chart_sparkline/chart_sparkline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:line_chart/charts/line-chart.widget.dart';
@@ -209,7 +210,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                 ),
                               ),
                               const SizedBox(
-                                height: 90,
+                                height: 100,
                               ),
                               SizedBox(
                                 height: 160.0,
@@ -378,6 +379,31 @@ class _UserStatisticsState extends State<_UserStatistics> {
               ],
             ),
           ),
+        const SizedBox(
+          height: 40,
+        ),
+        LayoutBuilder(
+          builder: (_, constraints) {
+            const double dashWidth = 6;
+            const double dashSpacing = 4;
+            final amountOfDashes =
+                constraints.maxWidth ~/ (dashWidth + dashSpacing);
+            return SizedBox(
+              height: 2.5,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: List.generate(
+                  amountOfDashes,
+                  (index) => Container(
+                    width: dashWidth,
+                    margin: const EdgeInsets.only(right: dashSpacing),
+                    decoration: const BoxDecoration(color: AppColors.grey4),
+                  ),
+                ),
+              ),
+            );
+          },
+        )
       ],
     );
   }

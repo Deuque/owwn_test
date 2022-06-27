@@ -9,15 +9,19 @@ environment:
   flutter: ">=3.0.2"
 
 dependencies:
+  bloc_test: ^9.0.3
+  chart_sparkline: ^1.0.11
+  equatable: ^2.0.3
   flutter:
     sdk: flutter
-  equatable: ^2.0.3
   flutter_bloc: ^8.0.1
-  http: ^0.13.4
-  bloc_test: ^9.0.3
-  go_router: ^4.0.1
   flutter_secure_storage: ^5.0.2
-  chart_sparkline: ^1.0.11
+  go_router: ^4.0.1
+  http: ^0.13.4
+
+
+
+
   line_chart: ^1.1.11
 
 

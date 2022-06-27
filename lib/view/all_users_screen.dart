@@ -53,7 +53,7 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
               builder: (BuildContext context, BoxConstraints constraints) {
                 final top = constraints.biggest.height;
                 return FlexibleSpaceBar(
-                  title: top <= 80 ? const Text('Users') : null,
+                  title: top <= 105 ? const Text('Users') : null,
                   centerTitle: true,
                   background: _background(),
                 );
