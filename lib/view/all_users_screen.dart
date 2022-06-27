@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
+import 'package:owwn_coding_challenge/main.dart';
 import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/styles.dart';
 
@@ -194,14 +196,19 @@ class _UsersPageLayout extends StatelessWidget {
         users.where((element) => element.status == Status.inactive);
     return Column(
       children: [
-        if (activeUsers.isNotEmpty) _userGroup('Active', activeUsers.toList()),
+        if (activeUsers.isNotEmpty)
+          _userGroup(
+            context,
+            'Active',
+            activeUsers.toList(),
+          ),
         if (inActiveUsers.isNotEmpty)
-          _userGroup('Inactive', inActiveUsers.toList()),
+          _userGroup(context, 'Inactive', inActiveUsers.toList()),
       ],
     );
   }
 
-  Widget _userGroup(String title, List<User> groupUsers) {
+  Widget _userGroup(BuildContext context, String title, List<User> groupUsers) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +223,7 @@ class _UsersPageLayout extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: AppColors.dark2,
+            color: AppColors.grey4,
           ),
           child: ListView.separated(
             padding: EdgeInsets.zero,
@@ -225,26 +232,55 @@ class _UsersPageLayout extends StatelessWidget {
             itemBuilder: (_, i) {
               final user = groupUsers[i];
               return ListTile(
+                onTap: () => context
+                    .goNamed(RouteNames.userDetails, params: {'id': user.id}),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                leading: CircleAvatar(
-                  backgroundColor: Colors.white.withOpacity(.08),
-                  radius: 19,
-                  child: Text(
-                    user.initials(),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
+                leading: Hero(
+                  tag: user.initials,
+                  child: CircleAvatar(
+                    backgroundColor: AppColors.grey3,
+                    radius: 19,
+                    child: Text(
+                      user.initials,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-                title: Text(
-                  user.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                title: Hero(
+                  tag: user.name,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      user.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
-                subtitle: Text(user.email),
+                subtitle: Hero(
+                  tag: user.email,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      user.email,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.grey2,
+                      ),
+                    ),
+                  ),
+                ),
               );
             },
             separatorBuilder: (_, i) => const Divider(

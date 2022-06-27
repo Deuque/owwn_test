@@ -21,23 +21,36 @@ class UsersCubit extends Cubit<UsersState> {
       emit(state.withError(response.error.toString()));
     } else {
       final usersResponse = response.value;
+      final newUserPages = [...state.userPages, usersResponse!.users];
       emit(
         state.copyWith(
           loading: false,
-          userPages: [...state.userPages, usersResponse!.users],
-          hasLoadedAllUsers: hasLoadedAllUsers(
-            userPagesLength: pageToLoad,
-            totalUsers: usersResponse.totalUsers,
-          ),
+          userPages: newUserPages,
+          hasLoadedAllUsers:
+              _allUsers(newUserPages).length >= usersResponse.totalUsers,
         ),
       );
     }
   }
 
-  bool hasLoadedAllUsers({
-    required int userPagesLength,
-    required int totalUsers,
-  }) {
-    return (limit * userPagesLength) >= totalUsers;
+  void updateUser(User newUser) {
+    final newUserPages = state.userPages.map((users) {
+      return users.map((e) => e.id == newUser.id ? newUser : e).toList();
+    }).toList();
+    emit(state.copyWith(userPages: newUserPages));
   }
+
+  User? getUser(String id) {
+    final allUsers = _allUsers(state.userPages);
+    for (final user in allUsers) {
+      if (id == user.id) return user;
+    }
+    return null;
+  }
+
+  List<User> _allUsers(List<List<User>> userPages) =>
+      userPages.fold<List<User>>(
+        [],
+        (previousValue, element) => previousValue..addAll(element),
+      );
 }

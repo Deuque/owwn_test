@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:owwn_coding_challenge/model/credentials.dart';
@@ -43,18 +44,14 @@ class CredentialsUnknown extends CredentialState {}
 
 class CredentialsUnAuthorized extends CredentialState {}
 
-class CredentialsAuthorized extends CredentialState {
+class CredentialsAuthorized extends CredentialState implements Equatable {
   final Credential credential;
 
   CredentialsAuthorized(this.credential);
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CredentialsAuthorized &&
-          runtimeType == other.runtimeType &&
-          credential == other.credential;
+  List<Object?> get props => [credential];
 
   @override
-  int get hashCode => credential.hashCode;
+  bool? get stringify => true;
 }

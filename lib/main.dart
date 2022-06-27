@@ -15,6 +15,7 @@ import 'package:owwn_coding_challenge/styles.dart';
 import 'package:owwn_coding_challenge/view/all_users_screen.dart';
 import 'package:owwn_coding_challenge/view/auth_screen.dart';
 import 'package:owwn_coding_challenge/view/start_screen.dart';
+import 'package:owwn_coding_challenge/view/user_details_screen.dart';
 
 class Config {
   final CredentialService credentialService;
@@ -114,13 +115,14 @@ class _MyAppState extends State<MyApp> {
           builder: (BuildContext context, GoRouterState state) =>
               const AllUsersScreen(),
           routes: [
-            // GoRoute(
-            //   name: RouteNames.userDetails,
-            //   path: RoutePaths.userDetails,
-            //   builder: (BuildContext context, GoRouterState state) => ThirdPage(
-            //     userName: state.params['name'] ?? '',
-            //   ),
-            // ),
+            GoRoute(
+              name: RouteNames.userDetails,
+              path: RoutePaths.userDetails,
+              builder: (BuildContext context, GoRouterState state) =>
+                  UserDetailsScreen(
+                userId: state.params['id'] ?? '',
+              ),
+            ),
           ],
         ),
       ],
@@ -161,116 +163,9 @@ class RoutePaths {
   static const startScreen = '/';
   static const authScreen = '/auth';
   static const users = '/users';
-  static const userDetails = ':name';
+  static const userDetails = ':id';
 }
 
 class RouteNames {
   static const userDetails = 'user_details';
 }
-//
-// class SecondPage extends StatelessWidget {
-//   const SecondPage({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Users'),
-//         actions: [
-//           IconButton(
-//             onPressed: () {
-//               BlocProvider.of<CredentialCubit>(context).deleteCredentials();
-//             },
-//             icon: const Icon(Icons.logout),
-//           )
-//         ],
-//       ),
-//       body: Column(
-//         children: users.map((user) {
-//           return GestureDetector(
-//             onTap: () => context
-//                 .goNamed(RouteNames.userDetails, params: {'name': user.name}),
-//             child: Container(
-//               margin: const EdgeInsets.only(bottom: 1),
-//               color: Colors.white,
-//               child: Row(
-//                 children: [
-//                   Container(
-//                     margin: const EdgeInsets.all(8),
-//                     padding: const EdgeInsets.all(16),
-//                     decoration: const BoxDecoration(
-//                       color: Colors.black,
-//                       shape: BoxShape.circle,
-//                     ),
-//                     child: Text(user.name.substring(0, 1)),
-//                   ),
-//                   Expanded(
-//                     child: DefaultTextStyle(
-//                       style: const TextStyle(color: Colors.black),
-//                       child: Column(
-//                         children: [
-//                           Text(user.name),
-//                           Text(user.email),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         }).toList(),
-//       ),
-//     );
-//   }
-// }
-//
-// class ThirdPage extends StatelessWidget {
-//   final String userName;
-//
-//   const ThirdPage({super.key, required this.userName});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final user = users.firstWhere(
-//       (element) => element.name == userName,
-//       orElse: () => const User(
-//         name: 'name',
-//         email: 'email',
-//         gender: Gender.male,
-//         status: Status.active,
-//         statistics: [],
-//       ),
-//     );
-//     return Scaffold(
-//       body: Align(
-//         alignment: const Alignment(0, -.5),
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Container(
-//               width: 80,
-//               height: 80,
-//               alignment: Alignment.center,
-//               decoration: const BoxDecoration(
-//                 color: Colors.black,
-//                 shape: BoxShape.circle,
-//               ),
-//               child: Text(user.name.substring(0, 1)),
-//             ),
-//             SizedBox(
-//               height: 80,
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: [
-//                   Text(user.name),
-//                   Text(user.email),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
