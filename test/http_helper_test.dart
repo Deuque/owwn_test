@@ -32,6 +32,7 @@ void main() {
 
     final httpHelper = HttpHelperImpl(
       baseUrl: '',
+      apiKey: '',
       client: client,
       getAccessToken: () => accessToken,
       getRefreshToken: () => '',
@@ -65,6 +66,7 @@ void main() {
 
     final httpHelper = HttpHelperImpl(
       baseUrl: '',
+      apiKey: '',
       client: client,
       getAccessToken: () => '',
       getRefreshToken: () => '',

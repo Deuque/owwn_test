@@ -131,7 +131,37 @@ void main() {
 
   testWidgets(
     'Panning on the chart shows the correct value',
-    (WidgetTester tester) async {},
+    (WidgetTester tester) async {
+      final userDetailsObject = WidgetObject<UserDetailsScreen>(tester);
+      final httpHelper = MockHttpHelper(
+        (_) => Response(sampleUsersResponse, 200),
+      );
+      usersCubit = UsersCubit(UsersServiceImpl(httpHelper));
+      await usersCubit.loadUsers();
+      await tester.pumpWidget(
+        _buildWidget(
+          usersCubit: usersCubit,
+          layout: const UserDetailsScreen(userId: 'id1'),
+        ),
+      );
+      await tester.pumpAndSettle(const Duration(milliseconds: 200));
+
+      // verify statistics chart is visible
+      expect(
+        userDetailsObject
+            .pageFinderByKey(UserDetailsScreenKeys.statisticsChart),
+        findsOneWidget,
+      );
+
+      // verify that dragging chart shows statistics value
+      await tester.dragUntilVisible(
+        userDetailsObject
+            .pageFinderByKey(UserDetailsScreenKeys.statisticsChart),
+        userDetailsObject
+            .pageFinderByKey(UserDetailsScreenKeys.statisticsTooltipDisplay),
+        const Offset(4, 4),
+      );
+    },
   );
 }
 
@@ -142,6 +172,7 @@ String sampleUsersResponse = jsonEncode({
       "name": "Ralph",
       "gender": "male",
       "status": "inactive",
+      "statistics": [20, 40, 60],
     }
   ],
   'total': 30

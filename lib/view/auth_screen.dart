@@ -58,7 +58,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 builder: (context, state) {
                   return ElevatedButton(
                     onPressed: () {
-                      FocusManager.instance.primaryFocus?.requestFocus();
+                      FocusManager.instance.primaryFocus?.unfocus();
                       if (_formKey.currentState?.validate() != true) return;
                       _formKey.currentState?.save();
                       BlocProvider.of<AuthCubit>(context).signIn(_emailValue!);

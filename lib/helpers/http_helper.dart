@@ -9,6 +9,7 @@ import 'package:owwn_coding_challenge/model/credentials.dart';
 
 class HttpHelperImpl extends HttpHelper {
   final String baseUrl;
+  final String apiKey;
   final http.Client client;
   final String Function() getAccessToken;
   final String Function() getRefreshToken;
@@ -17,6 +18,7 @@ class HttpHelperImpl extends HttpHelper {
 
   HttpHelperImpl({
     required this.baseUrl,
+    required this.apiKey,
     required this.client,
     required this.getAccessToken,
     required this.getRefreshToken,
@@ -38,7 +40,7 @@ class HttpHelperImpl extends HttpHelper {
           ..headers.addAll(headers ?? {})
           ..headers[HttpHeaders.authorizationHeader] =
               'Bearer ${getAccessToken()}'
-          ..headers['X-API-KEY'] = 'test-hermes'
+          ..headers['X-API-KEY'] = apiKey
           ..body = jsonEncode(body);
 
     log('REQUEST: $modifiedRequest $body');

@@ -1,6 +1,9 @@
+import 'package:chart_sparkline/chart_sparkline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:line_chart/charts/line-chart.widget.dart';
+import 'package:line_chart/model/line-chart.model.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/model/user.dart';
 import 'package:owwn_coding_challenge/styles.dart';
@@ -10,6 +13,8 @@ abstract class UserDetailsScreenKeys {
   static const nameField = Key('nameField');
   static const saveButton = Key('saveButton');
   static const backButton = Key('backButton');
+  static const statisticsChart = Key('statisticsChart');
+  static const statisticsTooltipDisplay = Key('statisticsTooltipDisplay');
 }
 
 class UserDetailsScreen extends StatefulWidget {
@@ -112,6 +117,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -158,6 +164,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                     key: UserDetailsScreenKeys.nameField,
                                     focusNode: _nameFocusNode,
                                     initialValue: name,
+                                    maxLines: 2,
+                                    minLines: 1,
                                     style: const TextStyle(
                                       fontSize: 28,
                                       fontWeight: FontWeight.w400,
@@ -182,6 +190,8 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                     key: UserDetailsScreenKeys.emailField,
                                     focusNode: _emailFocusNode,
                                     initialValue: email,
+                                    maxLines: 2,
+                                    minLines: 1,
                                     style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w400,
@@ -196,6 +206,17 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
                                     validator: _requiredField,
                                     onSaved: (s) => email = s!,
                                   ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 90,
+                              ),
+                              SizedBox(
+                                height: 160.0,
+                                child: _UserStatistics(
+                                  statistics: user.statistics
+                                      .map((e) => e.toDouble())
+                                      .toList(),
                                 ),
                               ),
                             ],
@@ -250,5 +271,114 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
 
     usersCubit.updateUser(newUser);
     _stopEditing();
+  }
+}
+
+class _UserStatistics extends StatefulWidget {
+  final List<double> statistics;
+
+  const _UserStatistics({Key? key, required this.statistics}) : super(key: key);
+
+  @override
+  State<_UserStatistics> createState() => _UserStatisticsState();
+}
+
+class _UserStatisticsState extends State<_UserStatistics> {
+  double _panXUpdate = 0;
+  double _panStatisticsValue = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Opacity(
+          opacity: _panXUpdate <= 0 ? 0 : 1,
+          child: Transform.translate(
+            offset: Offset(_panXUpdate == 0 ? 0 : _panXUpdate - 15, 0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              child: Text(
+                key: UserDetailsScreenKeys.statisticsTooltipDisplay,
+                '$_panStatisticsValue',
+                style: const TextStyle(color: AppColors.dark1),
+              ),
+            ),
+          ),
+        ),
+        if (widget.statistics.isNotEmpty)
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  right: 10,
+                  left: 0,
+                  bottom: 0,
+                  child: Sparkline(
+                    data: widget.statistics,
+                    lineWidth: 2.0,
+                    lineColor: Colors.white,
+                    useCubicSmoothing: true,
+                    cubicSmoothingFactor: 0.2,
+                  ),
+                ),
+                LayoutBuilder(
+                  builder: (_, constraints) {
+                    return Listener(
+                      key: UserDetailsScreenKeys.statisticsChart,
+                      onPointerMove: (moveEvent) {
+                        setState(() {
+                          _panXUpdate = moveEvent.position.dx;
+                        });
+                      },
+                      child: LineChart(
+                        width: constraints.maxWidth,
+                        height: constraints.maxHeight,
+                        data: List.generate(
+                          widget.statistics.length,
+                          (index) => LineChartModel(
+                            date: DateTime.now().add(
+                              Duration(days: index + 1),
+                            ),
+                            amount: widget.statistics[index],
+                          ),
+                        ),
+                        linePaint: Paint()
+                          ..strokeWidth = 2
+                          ..style = PaintingStyle.stroke
+                          ..color = Colors.transparent,
+                        circlePaint: Paint()..color = Colors.white,
+                        showPointer: true,
+                        linePointerDecoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        pointerDecoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                        onValuePointer: (LineChartModelCallback value) {
+                          setState(() {
+                            _panStatisticsValue = value.chart?.amount ?? 0;
+                          });
+                        },
+                        onDropPointer: () {
+                          setState(() {
+                            _panXUpdate = 0;
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
   }
 }

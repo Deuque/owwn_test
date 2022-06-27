@@ -32,6 +32,7 @@ class Config {
 void main() {
   HttpHelper getHttpHelper(BuildContext context) => HttpHelperImpl(
         baseUrl: 'https://ccoding.owwn.com/hermes',
+        apiKey: 'owwn-challenge-22bbdk',
         client: http.Client(),
         getAccessToken: () => credentialSel(context)?.accessToken ?? '',
         getRefreshToken: () => credentialSel(context)?.refreshToken ?? '',
