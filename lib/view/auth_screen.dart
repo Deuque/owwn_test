@@ -56,23 +56,30 @@ class _AuthScreenState extends State<AuthScreen> {
                   }
                 },
                 builder: (context, state) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      if (_formKey.currentState?.validate() != true) return;
-                      _formKey.currentState?.save();
-                      BlocProvider.of<AuthCubit>(context).signIn(_emailValue!);
-                    },
-                    child: state is AuthLoading
-                        ? const SizedBox(
+                  return state is AuthLoading
+                      ? const ElevatedButton(
+                          onPressed: null,
+                          child: SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
                               strokeWidth: 2,
                             ),
-                          )
-                        : const Text('Continue'),
-                  );
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            if (_formKey.currentState?.validate() != true) {
+                              return;
+                            }
+                            _formKey.currentState?.save();
+                            BlocProvider.of<AuthCubit>(context)
+                                .signIn(_emailValue!);
+                          },
+                          child: const Text('Continue'),
+                        );
                 },
               )
             ],

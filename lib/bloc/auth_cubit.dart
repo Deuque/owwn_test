@@ -22,6 +22,8 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthSuccess());
     }
   }
+
+  Future signOut() => credentialCubit.deleteCredentials();
 }
 
 abstract class AuthState {}

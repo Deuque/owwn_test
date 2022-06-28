@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:owwn_coding_challenge/bloc/auth_cubit.dart';
 import 'package:owwn_coding_challenge/bloc/users_cubit.dart';
 import 'package:owwn_coding_challenge/main.dart';
 import 'package:owwn_coding_challenge/model/user.dart';
@@ -49,6 +50,12 @@ class _AllUsersScreenState extends State<AllUsersScreen> {
             expandedHeight: 400.0,
             pinned: true,
             backgroundColor: AppColors.dark1,
+            actions: [
+              IconButton(
+                onPressed: () => BlocProvider.of<AuthCubit>(context).signOut(),
+                icon: const Icon(Icons.logout_rounded),
+              )
+            ],
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 final top = constraints.biggest.height;
